@@ -1,0 +1,289 @@
+definitions:
+  entity.Credentials:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  entity.Server:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      ipv4:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      user:
+        type: string
+    type: object
+  helper.Response:
+    properties:
+      data: {}
+      errors: {}
+      message:
+        type: string
+      status:
+        type: boolean
+      token:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: nguyenminhmannh2001@gmail.com
+    name: Nguyen Minh Manh
+    url: https://www.facebook.com/minhmannh2001/
+  description: A server management service API in Go using Gin framework.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Server Management System
+  version: "1.0"
+paths:
+  /api/server/:
+    post:
+      consumes:
+      - application/json
+      description: Create new server with provided information
+      parameters:
+      - description: Add server
+        in: body
+        name: server
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Server'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+      security:
+      - apiKey: []
+      summary: Create new server
+      tags:
+      - Server CRUD
+  /api/server/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Using ID to delete server
+      parameters:
+      - description: Server ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+      security:
+      - apiKey: []
+      summary: Delete server by ID
+      tags:
+      - Server CRUD
+    get:
+      consumes:
+      - application/json
+      description: Using ID to check server's existence
+      parameters:
+      - description: Server ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+      security:
+      - apiKey: []
+      summary: Get server by ID
+      tags:
+      - Server CRUD
+    put:
+      consumes:
+      - application/json
+      description: Update server with provided information
+      parameters:
+      - description: Update server
+        in: body
+        name: server
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Server'
+      - description: Server ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+      security:
+      - apiKey: []
+      summary: Update server
+      tags:
+      - Server CRUD
+  /api/servers:
+    get:
+      consumes:
+      - application/json
+      description: View or export servers based on url query
+      parameters:
+      - description: From
+        in: query
+        name: from
+        type: integer
+      - description: To
+        in: query
+        name: to
+        type: integer
+      - description: Account Per Page
+        in: query
+        name: perpage
+        type: integer
+      - description: Sort By
+        in: query
+        name: sortby
+        type: string
+      - description: Order
+        in: query
+        name: order
+        type: string
+      - description: Filter
+        in: query
+        name: filter
+        type: string
+      - description: Export
+        in: query
+        name: export
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+      security:
+      - apiKey: []
+      summary: Export servers
+      tags:
+      - Server CRUD
+    post:
+      consumes:
+      - application/json
+      description: Import servers within a excel file
+      parameters:
+      - description: Update server
+        in: formData
+        name: server
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+      security:
+      - apiKey: []
+      summary: Import servers
+      tags:
+      - Server CRUD
+  /api/servers/report:
+    get:
+      consumes:
+      - application/json
+      description: Report server information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/helper.Response'
+      security:
+      - apiKey: []
+      summary: Report server information intentionally
+      tags:
+      - Server CRUD
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: API authentication and authorization.
+      parameters:
+      - description: Add credential
+        in: body
+        name: credential
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Credentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+      summary: Login Handler
+      tags:
+      - Login
+securityDefinitions:
+  apiKey:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

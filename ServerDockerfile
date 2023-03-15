@@ -1,0 +1,13 @@
+FROM golang:1.20.1
+
+WORKDIR /opt/connection-response/
+
+COPY ./server-resources/connection-response.go .
+
+RUN go mod init vcs/sms
+
+RUN go get github.com/rabbitmq/amqp091-go
+
+RUN go get gopkg.in/matryer/try.v1
+
+ENTRYPOINT ["go", "run", "connection-response.go"]

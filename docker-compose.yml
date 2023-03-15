@@ -1,0 +1,111 @@
+version: '3.8'
+services:
+  db:
+    # image: postgres:14.1-alpine
+    build:
+      dockerfile: DatabaseDockerfile
+      context: .
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5678:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    # container_name: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
+  elasticsearch:
+    # container_name: es-container
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+    ports:
+      - 9200:9200
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+  kibana:
+    # container_name: kb-container
+    image: docker.elastic.co/kibana/kibana:7.11.0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601:5601
+  redis:
+    image: redis:7.0.9-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning 
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - cache:/data
+  sms:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: dev
+    volumes:
+      - .:/opt/sms
+    ports:
+      - 8080:8080
+    depends_on:
+     - db
+    command: bash -c "chown -R root:root /opt/sms/logs/ && chmod 0644 /opt/sms/logs/config/logrotate.conf &&  logrotate /opt/sms/logs/config/logrotate.conf --state /opt/sms/logs/logrotate-state && cron -f"
+  server1:
+    build:
+      dockerfile: ServerDockerfile
+      context: .
+    hostname: server1
+    depends_on:
+      - rabbitmq
+  server2:
+    build:
+      dockerfile: ServerDockerfile
+      context: .
+    hostname: server2
+    depends_on:
+      - rabbitmq
+  server3:
+    build:
+      dockerfile: ServerDockerfile
+      context: .
+    hostname: server3
+    depends_on:
+      - rabbitmq
+  server4:
+    build:
+      dockerfile: ServerDockerfile
+      context: .
+    hostname: server4
+    depends_on:
+      - rabbitmq
+  server5:
+    build:
+      dockerfile: ServerDockerfile
+      context: .
+    hostname: server5
+    depends_on:
+      - rabbitmq
+  nettool:
+    image: nicolaka/netshoot
+    command: tail -f /dev/null
+volumes:
+  db:
+    driver: local
+  cache:
+    driver: local
+  elasticsearch-data:
+    driver: local

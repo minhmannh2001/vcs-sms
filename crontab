@@ -1,0 +1,1 @@
+15 * * * * /opt/sms/logs/config/logrotate.conf --state /opt/sms/logs/logrotate-state
